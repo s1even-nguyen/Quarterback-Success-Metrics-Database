@@ -1,0 +1,71 @@
+#SCHEMA
+CREATE DATABASE IF NOT EXISTS qb_success_db;
+USE qb_success_db;
+
+#Table that stores information about NFL teams in the 2024 Season.
+CREATE TABLE IF NOT EXISTS team (
+    team_id INT NOT NULL,
+    team_name VARCHAR(100) NOT NULL,
+    team_city VARCHAR(100) NOT NULL,
+    wins INT NOT NULL,
+    losses INT NOT NULL,
+    playoffs VARCHAR(3) NOT NULL,
+    superbowl VARCHAR(3) NOT NULL,
+    superbowl_wins VARCHAR(3) NOT NULL,
+    PRIMARY KEY (team_id)
+);
+SELECT * FROM team;
+
+#Table that stores information about NFL Quarterbacks that played the majority of their team's snaps in the 2024 Season.
+CREATE TABLE IF NOT EXISTS player (
+    player_id INT NOT NULL,
+    first_name VARCHAR(100) NOT NULL,
+    last_name VARCHAR(100) NOT NULL,
+    age INT NOT NULL,
+    team_id INT NOT NULL,
+    PRIMARY KEY (player_id),
+    FOREIGN KEY (team_id) 
+		REFERENCES team(team_id)
+);
+SELECT * FROM player;
+
+#Table that stores information about NFL Quarterbacks in the 2024 Season and their draft details.
+CREATE TABLE IF NOT EXISTS draft (
+    player_id INT NOT NULL,
+    drafted VARCHAR(3) NOT NULL,
+    round INT,
+    pick_number INT,
+    overall_pick INT,
+    college VARCHAR(100),
+    draft_year INT NOT NULL,
+    PRIMARY KEY (player_id, college),
+    FOREIGN KEY (player_id) 
+		REFERENCES player(player_id)
+);
+SELECT * FROM draft;
+
+#Table that stores key performance statistics on NFL Quarterbacks in the 2024 Season.
+CREATE TABLE IF NOT EXISTS statistics (
+    player_id INT NOT NULL,
+    season_year INT NOT NULL,
+    games_played INT NOT NULL,
+    games_started INT NOT NULL,
+    completions INT NOT NULL,
+    attempts INT NOT NULL,
+    passing_yards INT NOT NULL,
+    passing_tds INT NOT NULL,
+    interceptions INT NOT NULL,
+    passer_rating DECIMAL(5,1) NOT NULL,
+    qb_rating DECIMAL(5,1) NOT NULL,
+    rushing_attempts INT NOT NULL,
+    rushing_yards INT NOT NULL,
+    rushing_tds INT NOT NULL,
+    total_yards INT NOT NULL,
+    total_tds INT NOT NULL,
+    fumbles INT NOT NULL,
+    total_turnovers INT NOT NULL,
+    PRIMARY KEY (player_id, season_year),
+    FOREIGN KEY (player_id) 
+		REFERENCES player(player_id)
+);
+SELECT * FROM statistics;
