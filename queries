@@ -1,0 +1,166 @@
+#Queries
+#5.1 Finding The Average Total Touchdowns among Quarterbacks
+SELECT 
+    AVG(total_tds) AS "Average QB Total TDS"
+FROM statistics;
+
+#5.2 Finding Quarterback(s) Who Scored More Than the Average Total Touchdowns (JOIN/NESTED)
+SELECT 
+    player.first_name,
+    player.last_name,
+    statistics.total_tds,
+    team.team_name
+FROM statistics
+JOIN player ON statistics.player_id = player.player_id
+JOIN team ON player.team_id = team.team_id
+WHERE statistics.total_tds > (
+    SELECT AVG(total_tds)
+    FROM statistics
+)
+ORDER BY statistics.total_tds DESC;
+
+#5.3 Finding Playoff Quarterback(s) Who Scored More Than the Average Total Touchdowns (JOIN/NESTED)
+SELECT 
+    player.first_name,
+    player.last_name,
+    statistics.total_tds,
+    team.team_name,
+    team.playoffs
+FROM statistics
+JOIN player ON statistics.player_id = player.player_id
+JOIN team ON player.team_id = team.team_id
+WHERE statistics.total_tds > (
+    SELECT AVG(total_tds)
+    FROM statistics
+)
+AND team.playoffs = "YES"
+ORDER BY statistics.total_tds DESC;
+
+#5.4 Comparing Average Total Yards Between Playoff vs Non-Playoff Quarterbacks (JOIN)
+SELECT 
+team.playoffs AS "Playoffs", 
+AVG(statistics.total_yards) AS "Average Total Yards"
+FROM statistics
+JOIN player ON statistics.player_id = player.player_id
+JOIN team ON player.team_id = team.team_id
+GROUP BY team.playoffs;
+
+#5.5 Finding Quarterback(s) Who Were Healthy and Their Playoff Status (JOIN)
+SELECT 
+    player.first_name,
+    player.last_name,
+    statistics.games_started,
+    team.wins,
+    team.playoffs
+FROM statistics
+JOIN player ON statistics.player_id = player.player_id
+JOIN team ON player.team_id = team.team_id
+WHERE statistics.games_started > 14
+ORDER BY statistics.games_started DESC;
+
+#5.6 Comparing Average Age between Playoff vs non-Playoff Quarterbacks (JOIN)
+SELECT team.playoffs AS "Playoffs", AVG(player.age) AS "Average QB Age"
+FROM player
+JOIN team ON player.team_id = team.team_id
+GROUP BY team.playoffs;
+
+#5.7 Finding the Amount of Drafted vs. Undrafted Quarterbacks
+SELECT draft.drafted, COUNT(*) AS count_qbs
+FROM draft
+GROUP BY draft.drafted;
+
+#5.8 Finding the Relationship Between Team Wins of a Quarterback and Turnovers (JOIN)
+SELECT 
+    player.first_name,
+    player.last_name,
+    statistics.total_turnovers,
+    team.wins
+FROM statistics
+JOIN player ON statistics.player_id = player.player_id
+JOIN team ON player.team_id = team.team_id
+ORDER BY team.wins DESC;
+
+#5.9 Finding the Relationship Between Total Yards of a Quarterback and Turnovers (JOIN)
+SELECT 
+    player.first_name,
+    player.last_name,
+    statistics.total_yards,
+    statistics.total_turnovers
+FROM statistics
+JOIN player ON statistics.player_id = player.player_id
+ORDER BY statistics.total_turnovers DESC;
+
+#5.10 Finding Quarterbacks With the Most Total Touchdowns and Their Win Amount (JOIN)
+SELECT 
+    player.first_name, 
+    player.last_name, 
+    statistics.total_tds, 
+    team.team_name, 
+    team.wins,
+    team.playoffs
+FROM statistics
+JOIN player ON statistics.player_id = player.player_id
+JOIN team ON player.team_id = team.team_id
+ORDER BY statistics.total_tds DESC
+LIMIT 16;
+
+#5.11 Finding Which College Produced the Most Quarterbacks on Winning Teams (JOIN)
+SELECT 
+    draft.college,
+    COUNT(*) AS quarterbacks_on_winning_team
+FROM draft
+JOIN player ON draft.player_id = player.player_id
+JOIN team ON player.team_id = team.team_id
+WHERE team.wins > team.losses
+GROUP BY draft.college
+ORDER BY quarterbacks_on_winning_team DESC;
+
+#5.12 Finding Which Round(s) Produced the Most Quarterbacks on Winning Teams (JOIN)
+SELECT 
+    draft.round,
+    COUNT(*) AS "Quarterbacks on Winning Team"
+FROM draft
+JOIN player ON draft.player_id = player.player_id
+JOIN team ON player.team_id = team.team_id
+WHERE team.wins > team.losses
+GROUP BY draft.round
+ORDER BY draft.round;
+
+#5.13 Finding the Average Rushing Yards among Quarterbacks
+SELECT 
+    AVG(rushing_yards) AS "Average Rushing Yards"
+FROM statistics;
+
+#5.14 Finding Which Quarterback(s) Had Rushed Above the Average for Quarterbacks (JOIN/NESTED)
+SELECT 
+    player.first_name, 
+    player.last_name, 
+    statistics.rushing_yards, 
+    statistics.rushing_tds,
+    team.wins,
+    team.playoffs
+FROM statistics
+JOIN player ON statistics.player_id = player.player_id
+JOIN team ON player.team_id = team.team_id
+WHERE statistics.rushing_yards > (
+    SELECT AVG(rushing_yards) FROM statistics
+)
+ORDER BY statistics.rushing_yards DESC;
+
+#5.15 Statistics of a Super Bowl Winning Quarterback (JOIN)
+SELECT 
+    player.first_name,
+    player.last_name,
+    team.team_name,
+    statistics.games_played,
+    statistics.total_yards,
+    statistics.total_tds,
+    statistics.passing_yards,
+    statistics.passing_tds,
+    statistics.rushing_yards,
+    statistics.rushing_tds,
+    statistics.total_turnovers
+FROM statistics
+JOIN player ON statistics.player_id = player.player_id
+JOIN team ON player.team_id = team.team_id
+WHERE team.superbowl_wins = "YES";
